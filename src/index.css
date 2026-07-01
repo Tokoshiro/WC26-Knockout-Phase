@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply bg-background text-text-primary antialiased transition-colors duration-300 font-sans overflow-hidden select-none;
+    @apply bg-background text-text-primary antialiased transition-colors duration-300 font-sans select-none;
   }
 }
 

@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTournamentStore } from './store/useTournamentStore';
 import { CircularBracket } from './components/Bracket/CircularBracket';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { ThemeToggle } from './components/ThemeToggle/ThemeToggle';
-import { Trophy, Sparkles, Info } from 'lucide-react';
+import { DonatePage } from './components/DonatePage/DonatePage';
+import { Trophy, Sparkles, Info, Heart } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'bracket' | 'donate'>('bracket');
   const {
     currentTournamentId,
     tournaments,
@@ -54,6 +56,20 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undoMatch, redo]);
 
+  if (currentView === 'donate') {
+    return (
+      <>
+        <DonatePage onBack={() => setCurrentView('bracket')} />
+        {toastMessage && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl glass-panel bg-surface/95 border border-accent/40 shadow-2xl animate-bounce text-text-primary text-xs sm:text-sm font-medium max-w-md">
+            <Info className="w-4 h-4 text-accent shrink-0" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="w-full h-screen overflow-hidden bg-background relative select-none font-sans flex flex-col">
       {/* Top Header / Title Bar */}
@@ -87,6 +103,16 @@ export const App: React.FC = () => {
 
       {/* Bottom Floating Toolbar */}
       <Toolbar />
+
+      {/* Bottom Left Donate Button */}
+      <button
+        onClick={() => setCurrentView('donate')}
+        aria-label="Donar en criptomonedas"
+        className="fixed bottom-6 left-4 sm:left-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-2xl glass-panel bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold shadow-xl hover:shadow-glow transition-all duration-300 active:scale-95 cursor-pointer"
+      >
+        <Heart className="w-4 h-4 fill-white animate-pulse" />
+        <span>Donar</span>
+      </button>
 
       {/* Toast Notification Popup */}
       {toastMessage && (
