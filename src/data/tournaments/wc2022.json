@@ -1,0 +1,174 @@
+{
+  "id": "wc2022",
+  "name": "Mundial 2022 - Octavos a Final",
+  "year": 2022,
+  "description": "Copa Mundial de la FIFA Qatar 2022 (Fase eliminatoria 16 equipos)",
+  "totalRounds": 4,
+  "matches": [
+    {
+      "id": 1,
+      "left": { "id": "nl", "name": "Países Bajos", "code": "nl", "flagUrl": "https://flagcdn.com/w80/nl.png" },
+      "right": { "id": "us", "name": "Estados Unidos", "code": "us", "flagUrl": "https://flagcdn.com/w80/us.png" },
+      "winner": null,
+      "nextMatchId": 9,
+      "nextSlot": "left",
+      "round": 2,
+      "side": "left",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 2,
+      "left": { "id": "ar", "name": "Argentina", "code": "ar", "flagUrl": "https://flagcdn.com/w80/ar.png" },
+      "right": { "id": "au", "name": "Australia", "code": "au", "flagUrl": "https://flagcdn.com/w80/au.png" },
+      "winner": null,
+      "nextMatchId": 9,
+      "nextSlot": "right",
+      "round": 2,
+      "side": "left",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 3,
+      "left": { "id": "jp", "name": "Japón", "code": "jp", "flagUrl": "https://flagcdn.com/w80/jp.png" },
+      "right": { "id": "hr", "name": "Croacia", "code": "hr", "flagUrl": "https://flagcdn.com/w80/hr.png" },
+      "winner": null,
+      "nextMatchId": 10,
+      "nextSlot": "left",
+      "round": 2,
+      "side": "left",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 4,
+      "left": { "id": "br", "name": "Brasil", "code": "br", "flagUrl": "https://flagcdn.com/w80/br.png" },
+      "right": { "id": "kr", "name": "Corea del Sur", "code": "kr", "flagUrl": "https://flagcdn.com/w80/kr.png" },
+      "winner": null,
+      "nextMatchId": 10,
+      "nextSlot": "right",
+      "round": 2,
+      "side": "left",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 5,
+      "left": { "id": "gb-eng", "name": "Inglaterra", "code": "gb-eng", "flagUrl": "https://flagcdn.com/w80/gb-eng.png" },
+      "right": { "id": "sn", "name": "Senegal", "code": "sn", "flagUrl": "https://flagcdn.com/w80/sn.png" },
+      "winner": null,
+      "nextMatchId": 11,
+      "nextSlot": "left",
+      "round": 2,
+      "side": "right",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 6,
+      "left": { "id": "fr", "name": "Francia", "code": "fr", "flagUrl": "https://flagcdn.com/w80/fr.png" },
+      "right": { "id": "pl", "name": "Polonia", "code": "pl", "flagUrl": "https://flagcdn.com/w80/pl.png" },
+      "winner": null,
+      "nextMatchId": 11,
+      "nextSlot": "right",
+      "round": 2,
+      "side": "right",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 7,
+      "left": { "id": "ma", "name": "Marruecos", "code": "ma", "flagUrl": "https://flagcdn.com/w80/ma.png" },
+      "right": { "id": "es", "name": "España", "code": "es", "flagUrl": "https://flagcdn.com/w80/es.png" },
+      "winner": null,
+      "nextMatchId": 12,
+      "nextSlot": "left",
+      "round": 2,
+      "side": "right",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 8,
+      "left": { "id": "pt", "name": "Portugal", "code": "pt", "flagUrl": "https://flagcdn.com/w80/pt.png" },
+      "right": { "id": "ch", "name": "Suiza", "code": "ch", "flagUrl": "https://flagcdn.com/w80/ch.png" },
+      "winner": null,
+      "nextMatchId": 12,
+      "nextSlot": "right",
+      "round": 2,
+      "side": "right",
+      "label": "Octavos de final"
+    },
+    {
+      "id": 9,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 13,
+      "nextSlot": "left",
+      "round": 3,
+      "side": "left",
+      "label": "Cuartos de final"
+    },
+    {
+      "id": 10,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 13,
+      "nextSlot": "right",
+      "round": 3,
+      "side": "left",
+      "label": "Cuartos de final"
+    },
+    {
+      "id": 11,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 14,
+      "nextSlot": "left",
+      "round": 3,
+      "side": "right",
+      "label": "Cuartos de final"
+    },
+    {
+      "id": 12,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 14,
+      "nextSlot": "right",
+      "round": 3,
+      "side": "right",
+      "label": "Cuartos de final"
+    },
+    {
+      "id": 13,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 15,
+      "nextSlot": "left",
+      "round": 4,
+      "side": "left",
+      "label": "Semifinal"
+    },
+    {
+      "id": 14,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": 15,
+      "nextSlot": "right",
+      "round": 4,
+      "side": "right",
+      "label": "Semifinal"
+    },
+    {
+      "id": 15,
+      "left": null,
+      "right": null,
+      "winner": null,
+      "nextMatchId": null,
+      "nextSlot": null,
+      "round": 5,
+      "side": "center",
+      "label": "Gran Final"
+    }
+  ]
+}
