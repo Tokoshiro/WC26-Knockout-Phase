@@ -427,7 +427,7 @@ export const useTournamentStore = create<TournamentStore>()(
       },
     }),
     {
-      name: 'wc2026-tournament-storage-v4',
+      name: 'wc2026-tournament-storage-v5',
       partialize: (state) => ({
         tournaments: state.tournaments,
         currentTournamentId: state.currentTournamentId,
