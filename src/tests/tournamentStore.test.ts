@@ -34,42 +34,42 @@ describe('useTournamentStore - Tournament Logic & Rules', () => {
   it('should select a winner in an undecided match and advance them to the next match slot', () => {
     const store = useTournamentStore.getState();
     const tournament = store.tournaments['wc2026'];
-    const match5 = tournament.matches.find((m) => m.id === 5)!; // Croacia vs Portugal
-    const croacia = match5.left!;
+    const match17 = tournament.matches.find((m) => m.id === 17)!; // Paraguay vs Francia
+    const paraguay = match17.left!;
 
-    expect(match5.winner).toBeNull();
+    expect(match17.winner).toBeNull();
     
-    // Select Croacia as winner of Match 5
-    const success = store.selectWinner(5, croacia);
+    // Select Paraguay as winner of Match 17
+    const success = store.selectWinner(17, paraguay);
     expect(success).toBe(true);
 
     const updatedTournament = useTournamentStore.getState().tournaments['wc2026'];
-    const updatedMatch5 = updatedTournament.matches.find((m) => m.id === 5)!;
-    const nextMatch19 = updatedTournament.matches.find((m) => m.id === 19)!;
+    const updatedMatch17 = updatedTournament.matches.find((m) => m.id === 17)!;
+    const nextMatch25 = updatedTournament.matches.find((m) => m.id === 25)!;
 
-    expect(updatedMatch5.winner?.id).toBe('hr');
-    expect(nextMatch19.left?.id).toBe('hr');
+    expect(updatedMatch17.winner?.id).toBe('py');
+    expect(nextMatch25.left?.id).toBe('py');
   });
 
   it('should NOT allow a country to advance to the next phase if it does not leave an opponent behind (both left and right must be present)', () => {
     const store = useTournamentStore.getState();
     const tournament = store.tournaments['wc2026'];
     
-    // Advance Croacia from Match 5 so Match 19 has left = Croacia, but right = null
-    const match5 = tournament.matches.find((m) => m.id === 5)!;
-    store.selectWinner(5, match5.left!);
+    // Advance Paraguay from Match 17 so Match 25 has left = Paraguay, but right = null
+    const match17 = tournament.matches.find((m) => m.id === 17)!;
+    store.selectWinner(17, match17.left!);
 
-    const match19 = useTournamentStore.getState().tournaments['wc2026'].matches.find((m) => m.id === 19)!;
-    expect(match19.left?.id).toBe('hr');
-    expect(match19.right).toBeNull();
+    const match25 = useTournamentStore.getState().tournaments['wc2026'].matches.find((m) => m.id === 25)!;
+    expect(match25.left?.id).toBe('py');
+    expect(match25.right).toBeNull();
 
-    // Attempt to advance Croacia from Match 19 when right opponent is null
-    const advanceSuccess = store.selectWinner(19, match19.left!);
+    // Attempt to advance Paraguay from Match 25 when right opponent is null
+    const advanceSuccess = store.selectWinner(25, match25.left!);
     expect(advanceSuccess).toBe(false); // MUST BE FALSE! Cannot advance without leaving behind another team
 
-    // Verify Match 19 winner is still null
+    // Verify Match 25 winner is still null
     const afterAttempt = useTournamentStore.getState().tournaments['wc2026'];
-    expect(afterAttempt.matches.find((m) => m.id === 19)!.winner).toBeNull();
+    expect(afterAttempt.matches.find((m) => m.id === 25)!.winner).toBeNull();
   });
 
   it('should allow advancing to next phase once BOTH opponent teams are defined in the match', () => {
@@ -93,19 +93,19 @@ describe('useTournamentStore - Tournament Logic & Rules', () => {
   it('should allow undoing a regular match result via right click (undoMatchResult) only if it does not affect future defined matches', () => {
     const store = useTournamentStore.getState();
     const tournament = store.tournaments['wc2026'];
-    const match5 = tournament.matches.find((m) => m.id === 5)!; // Croacia vs Portugal
-    const croacia = match5.left!;
+    const match17 = tournament.matches.find((m) => m.id === 17)!; // Paraguay vs Francia
+    const paraguay = match17.left!;
 
-    store.selectWinner(5, croacia);
-    expect(useTournamentStore.getState().tournaments['wc2026'].matches.find((m) => m.id === 5)!.winner?.id).toBe('hr');
+    store.selectWinner(17, paraguay);
+    expect(useTournamentStore.getState().tournaments['wc2026'].matches.find((m) => m.id === 17)!.winner?.id).toBe('py');
 
-    // Undo Match 5
-    const undoSuccess = store.undoMatchResult(5);
+    // Undo Match 17
+    const undoSuccess = store.undoMatchResult(17);
     expect(undoSuccess).toBe(true);
     
     const afterUndo = useTournamentStore.getState().tournaments['wc2026'];
-    expect(afterUndo.matches.find((m) => m.id === 5)!.winner).toBeNull();
-    expect(afterUndo.matches.find((m) => m.id === 19)!.left).toBeNull();
+    expect(afterUndo.matches.find((m) => m.id === 17)!.winner).toBeNull();
+    expect(afterUndo.matches.find((m) => m.id === 25)!.left).toBeNull();
   });
 
   it('should NOT allow undoing a match if it already affected a subsequent completed match', () => {
