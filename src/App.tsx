@@ -108,7 +108,7 @@ export const App: React.FC = () => {
       <button
         onClick={() => setCurrentView('donate')}
         aria-label="Donar en criptomonedas"
-        className="fixed bottom-6 left-4 sm:left-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-2xl glass-panel bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold shadow-xl hover:shadow-glow transition-all duration-300 active:scale-95 cursor-pointer"
+        className="fixed bottom-24 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-2xl glass-panel bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold shadow-xl hover:shadow-glow transition-all duration-300 active:scale-95 cursor-pointer"
       >
         <Heart className="w-4 h-4 fill-white animate-pulse" />
         <span>Donar</span>

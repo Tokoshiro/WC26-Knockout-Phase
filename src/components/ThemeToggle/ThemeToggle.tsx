@@ -6,7 +6,7 @@ export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTournamentStore();
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+    <div className="fixed top-20 right-4 z-50 flex items-center gap-2 sm:top-4">
       <button
         onClick={toggleTheme}
         aria-label="Cambiar tema (Claro / Oscuro)"
