@@ -3,8 +3,8 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { Crown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useTournamentStore } from '../../store/useTournamentStore';
-import { calculateTournamentGeometry, createBranchPath, getMatchRadius } from '../../utils/geometry';
-import type { Country, Match } from '../../types/tournament';
+import { calculateTournamentGeometry, createBranchPath, getMatchRadius, type Coords, type FeederSlotCoords } from '../../utils/geometry';
+import type { Country, Match, Tournament } from '../../types/tournament';
 
 const WorldCupTrophyGraphic: React.FC = () => (
   <g transform="translate(0, 0)" className="select-none pointer-events-none drop-shadow-xl">
@@ -120,27 +120,114 @@ const getInitialScale = () => {
   return Math.max(0.45, Math.min(1.2, fitDim / 1100));
 };
 
+const TRAIL_COLORS: Record<string, string> = {
+  fr: '#003087',
+  es: '#c60b1d',
+  'gb-eng': '#ffffff',
+  ar: '#74b9ff',
+};
+
+const getCountryTrailPaths = (
+  tournament: Tournament,
+  finalFourIds: string[],
+  coordsMap: Record<number, Coords>,
+  feederSlots: FeederSlotCoords[],
+) => {
+  return finalFourIds.map((countryId) => {
+    const trailMatches = tournament.matches
+      .filter((match) => match.winner?.id === countryId)
+      .sort((a, b) => a.round - b.round);
+
+    const paths: string[] = [];
+    if (trailMatches.length === 0) {
+      return { countryId, paths };
+    }
+
+    const firstMatch = trailMatches[0];
+    const side = firstMatch.left?.id === countryId ? 'left' : 'right';
+    const feederSlot = feederSlots.find((slot) => slot.matchId === firstMatch.id && slot.slot === side);
+    const firstCoords = coordsMap[firstMatch.id];
+
+    if (feederSlot && firstCoords) {
+      paths.push(createBranchPath(feederSlot, firstCoords));
+    }
+
+    trailMatches.forEach((match) => {
+      if (match.nextMatchId !== null) {
+        const nextMatch = tournament.matches.find((m) => m.id === match.nextMatchId);
+        if (nextMatch?.winner?.id !== countryId) {
+          return;
+        }
+
+        const fromCoords = coordsMap[match.id];
+        const toCoords = coordsMap[match.nextMatchId];
+        if (fromCoords && toCoords) {
+          paths.push(createBranchPath(fromCoords, toCoords));
+        }
+      }
+    });
+
+    return { countryId, paths };
+  });
+};
+
 export const CircularBracket: React.FC = () => {
   const { currentTournamentId, tournaments, selectWinner, undoMatchResult, theme } = useTournamentStore();
   const tournament = tournaments[currentTournamentId];
 
   const prevWinnerRef = useRef<string | null>(null);
 
-  const { coordsMap, feederSlots, finalMatch, rings } = useMemo(() => {
+  const memoizedBracket = useMemo<{
+    coordsMap: Record<number, Coords>;
+    feederSlots: FeederSlotCoords[];
+    finalMatch: Match | undefined;
+    rings: number[];
+    trailPaths: Array<{ countryId: string; paths: string[] }>;
+  } | null>(() => {
     if (!tournament) {
-      return { coordsMap: {}, feederSlots: [], finalMatch: undefined, rings: [] };
+      return null;
     }
 
     const { coordsMap, feederSlots } = calculateTournamentGeometry(tournament.matches, tournament.totalRounds);
-    const final = tournament.matches.find((m) => m.side === 'center' || m.round === tournament.totalRounds);
+    const finalMatch = tournament.matches.find((m) => m.side === 'center' || m.round === tournament.totalRounds);
 
-    const rList: number[] = [];
+    const rings: number[] = [];
     for (let r = 0; r <= tournament.totalRounds - 1; r++) {
-      rList.push(getMatchRadius(r, tournament.totalRounds));
+      rings.push(getMatchRadius(r, tournament.totalRounds));
     }
 
-    return { coordsMap, feederSlots, finalMatch: final, rings: rList };
+    const semifinalMatches = tournament.matches.filter((m) => m.round === tournament.totalRounds - 1 && m.side !== 'center');
+    const finalFourIds = semifinalMatches
+      .flatMap((match) => [match.left, match.right])
+      .filter((country): country is Country => country !== null)
+      .map((country) => country.id);
+
+    const uniqueFinalFourIds = Array.from(new Set(finalFourIds));
+    const eliminatedIds = new Set<string>();
+
+    tournament.matches.forEach((match) => {
+      [match.left, match.right].forEach((country) => {
+        if (country && match.winner && match.winner.id !== country.id) {
+          eliminatedIds.add(country.id);
+        }
+      });
+    });
+
+    const activeTrailIds = uniqueFinalFourIds.filter((id) => !eliminatedIds.has(id));
+    const trailPaths = getCountryTrailPaths(tournament, activeTrailIds, coordsMap, feederSlots);
+
+    return { coordsMap, feederSlots, finalMatch, rings, trailPaths };
   }, [tournament]);
+
+  if (!memoizedBracket) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center text-text-muted font-medium">
+        Cargando datos del torneo...
+      </div>
+    );
+  }
+
+  const { coordsMap, feederSlots, finalMatch, rings, trailPaths } = memoizedBracket;
 
   const champion = finalMatch?.winner || null;
 
@@ -206,6 +293,15 @@ export const CircularBracket: React.FC = () => {
                 className="w-full h-full overflow-visible"
                 style={{ backgroundColor: theme === 'dark' ? '#090d16' : '#f8fafc' }}
               >
+                <defs>
+                  <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
                 {/* Layer 0: Decorative Concentric Rings */}
                 <g className="pointer-events-none">
                   {rings.map((rad, idx) => (
@@ -227,7 +323,26 @@ export const CircularBracket: React.FC = () => {
 
                 {/* Layer 1: Orthogonal Connecting Lines (ALL IDENTICAL AS REQUESTED) */}
                 <g className="pointer-events-none">
-                  {/* 1. Lines from outer Round 0 feeder slots to Round 1 Match dots */}
+                  {/* 1. Colored trails for the last 4 countries still in play */}
+                  {trailPaths.map(({ countryId, paths }) => {
+                    const color = TRAIL_COLORS[countryId] || '#facc15';
+                    return paths.map((pathData, idx) => (
+                      <path
+                        key={`trail-${countryId}-${idx}`}
+                        d={pathData}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth="5"
+                        strokeOpacity="0.95"
+                        strokeLinecap="butt"
+                        strokeLinejoin="round"
+                        filter="url(#neonGlow)"
+                        className="transition-all duration-300"
+                      />
+                    ));
+                  })}
+
+                  {/* 2. Lines from outer Round 0 feeder slots to Round 1 Match dots */}
                   {feederSlots.map((feeder, idx) => {
                     const matchCoord = coordsMap[feeder.matchId];
                     if (!matchCoord) return null;
@@ -247,7 +362,7 @@ export const CircularBracket: React.FC = () => {
                     );
                   })}
 
-                  {/* 2. Lines from Round r matches to Round r+1 parent match dots */}
+                  {/* 3. Lines from Round r matches to Round r+1 parent match dots */}
                   {tournament.matches.map((match) => {
                     if (match.nextMatchId === null) return null;
                     const fromCoord = coordsMap[match.id];
