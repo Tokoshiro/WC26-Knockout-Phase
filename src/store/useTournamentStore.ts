@@ -104,6 +104,11 @@ export const useTournamentStore = create<TournamentStore>()(
 
         const match = tournament.matches[matchIndex];
 
+        // If clicking the same team that is already winner, do nothing
+        if (match.winner?.id === country.id) {
+          return true;
+        }
+
         // Check if locked
         if (match.locked) {
           setToast("Este encuentro está bloqueado por configuración inicial.");
@@ -196,8 +201,8 @@ export const useTournamentStore = create<TournamentStore>()(
 
         // If match has a winner, we want to undo THIS match
         if (match.winner !== null) {
-          // Check if isBaseState immutable
-          if (match.isBaseState) {
+          // Check if isBaseState or locked immutable
+          if (match.isBaseState || match.locked) {
             setToast("Este avance es parte del estado inicial fijo y no se puede retroceder.");
             return false;
           }
