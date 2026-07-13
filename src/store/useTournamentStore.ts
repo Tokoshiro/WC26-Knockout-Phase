@@ -5,9 +5,33 @@ import wc2026Data from '../data/tournaments/wc2026.json';
 import wc2022Data from '../data/tournaments/wc2022.json';
 import { decodeShareState, encodeShareState } from '../utils/urlShare';
 
+const cloneTournament = (tournament: Tournament): Tournament => JSON.parse(JSON.stringify(tournament));
+
+const propagateWinners = (tournament: Tournament): Tournament => {
+  const workingTournament = cloneTournament(tournament);
+
+  for (let round = 1; round <= workingTournament.totalRounds; round++) {
+    const roundMatches = workingTournament.matches.filter((m) => m.round === round);
+    roundMatches.forEach((match) => {
+      if (match.winner && match.nextMatchId !== null && match.nextSlot !== null) {
+        const nextMatch = workingTournament.matches.find((m) => m.id === match.nextMatchId);
+        if (nextMatch) {
+          if (match.nextSlot === 'left') {
+            nextMatch.left = { ...match.winner };
+          } else if (match.nextSlot === 'right') {
+            nextMatch.right = { ...match.winner };
+          }
+        }
+      }
+    });
+  }
+
+  return workingTournament;
+};
+
 const initialTournaments: Record<string, Tournament> = {
-  wc2026: wc2026Data as Tournament,
-  wc2022: wc2022Data as Tournament,
+  wc2026: propagateWinners(wc2026Data as Tournament),
+  wc2022: propagateWinners(wc2022Data as Tournament),
 };
 
 interface TournamentStore extends TournamentState {
@@ -98,6 +122,11 @@ export const useTournamentStore = create<TournamentStore>()(
           return false;
         }
 
+        // If clicking the same team that is already winner, do nothing
+        if (match.winner?.id === country.id) {
+          return true;
+        }
+
         // Check if already advanced to subsequent round that is already played
         if (match.nextMatchId !== null) {
           const nextMatch = tournament.matches.find((m) => m.id === match.nextMatchId);
@@ -105,11 +134,6 @@ export const useTournamentStore = create<TournamentStore>()(
             setToast("Este encuentro ya fue definido porque afecta partidos posteriores.");
             return false;
           }
-        }
-
-        // If clicking the same team that is already winner, do nothing
-        if (match.winner?.id === country.id) {
-          return true;
         }
 
         const previousWinner = match.winner ? { ...match.winner } : null;
@@ -324,7 +348,7 @@ export const useTournamentStore = create<TournamentStore>()(
         if (!initialTournamentData) return;
 
         const updatedTournaments = JSON.parse(JSON.stringify(tournaments));
-        updatedTournaments[currentTournamentId] = JSON.parse(JSON.stringify(initialTournamentData));
+        updatedTournaments[currentTournamentId] = cloneTournament(initialTournamentData);
 
         set({
           tournaments: updatedTournaments,
@@ -442,6 +466,15 @@ export const useTournamentStore = create<TournamentStore>()(
               document.documentElement.classList.remove('dark');
             }
           }
+        }
+
+        if (state && state.tournaments) {
+          Object.keys(state.tournaments).forEach((tournamentId) => {
+            const tournament = state.tournaments[tournamentId];
+            if (tournament) {
+              state.tournaments[tournamentId] = propagateWinners(tournament);
+            }
+          });
         }
       },
     }
